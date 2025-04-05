@@ -23,6 +23,17 @@ void main()
 {
     gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
 })";
+// The fragment shader is responsible for setting a pixel's color.
+// For the sake of simplicity, this is and orange hardcoded value (rgba).
+// The fragment shader only has one output which is a vec4 (FragColor in this case).
+const char* fragmentShaderSrc = R"(
+#version 330 core
+out vec4 FragColor;
+
+void main()
+{
+    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+})";
 
 int main() {
     glfwInit();
@@ -68,6 +79,16 @@ int main() {
 		// copy compilation info into the 512 long char array
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
+	// same for the fragment shader
+	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSrc, NULL);
+	glCompileShader(fragmentShader);
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
 
     // Initialize viewport. (same as the window for now)
