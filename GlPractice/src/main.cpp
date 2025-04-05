@@ -227,4 +227,7 @@ void drawTriangle()
 
 	// TODO: document this!!!
 	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	// TODO: document this!!!
+	glDeleteBuffers(1, &VBO);
 }
