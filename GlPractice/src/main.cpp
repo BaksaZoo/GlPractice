@@ -8,6 +8,21 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 // Handles drawing onto the screen.
 void draw();
+void drawTriangle();
+
+// This is the source code of the vertex shader.
+// This program will be run on the GPU after compiling it.
+// "in vec3 aPos" means that we take a 3D vector is an INPUT
+// "layout (location = 0)" means that we specify the location of the input variable, "aPos"
+// "gl_Position" will be the output of the sader which is always a vec4
+const char* vertexShaderSrc = R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
+
+void main()
+{
+    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+})";
 
 int main() {
     glfwInit();
@@ -35,6 +50,25 @@ int main() {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+	// compile shaders and attach it to the shader program
+	// 1. create a shader object, get its id
+	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	// 2. attach the shader source code to the shader object
+	// it is possible to attach multiple strings that contain source code (2nd, 3rd, 4th parameter of the function)
+	glShaderSource(vertexShader, 1, &vertexShaderSrc, NULL);
+	// 3. compile shaders
+	glCompileShader(vertexShader);
+	// check if shader compilation was successful. If not, print it to the console.
+	int success;
+	char infoLog[512];
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		// copy compilation info into the 512 long char array
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
 
     // Initialize viewport. (same as the window for now)
     // Im guessing this is for you to be able to set different sections of the screen for different purposes.
