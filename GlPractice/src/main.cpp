@@ -6,6 +6,8 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 // Method signature for a callback that gets invoked when the user presses a button.
 void processInput(GLFWwindow* window);
+// Handles drawing onto the screen.
+void draw();
 
 int main() {
     glfwInit();
@@ -47,6 +49,10 @@ int main() {
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
+
+        // put rendering commands in the middle of input processing and event polling
+        draw();
+
         // Not sure what this does but according to the docs, this will swap a large 2D buffer that contains the pixel
         // values for the provided window. This is probably the method that renders the modified screen buffer.
         // OpenGl uses a double buffering technique, where the front buffer is the buffer that gets rendered to the user
@@ -76,4 +82,12 @@ void processInput(GLFWwindow* window)
     {
         glfwSetWindowShouldClose(window, true);
     }
+}
+
+void draw()
+{
+    // clear the screen with rgba colors
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    // Tell OpenGl that it should redraw the screen with the specified color.
+    glClear(GL_COLOR_BUFFER_BIT);
 }
