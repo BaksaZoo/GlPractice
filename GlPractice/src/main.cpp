@@ -36,31 +36,31 @@ void main()
 })";
 
 int main() {
-    glfwInit();
-    // request client API with this version (3.3.?)
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    // Telling GLFW we want to use the core-profile means we'll get access to a smaller subset of OpenGL
-    // features without backwards-compatible features we no longer need. 
-    // This might lead to errors so comment it if you need to use legacy code.
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwInit();
+	// request client API with this version (3.3.?)
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	// Telling GLFW we want to use the core-profile means we'll get access to a smaller subset of OpenGL
+	// features without backwards-compatible features we no longer need. 
+	// This might lead to errors so comment it if you need to use legacy code.
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
-    // request GLFW to create a windows
-    GLFWwindow* window = glfwCreateWindow(800, 600, "GlPractice", NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
+	// request GLFW to create a windows
+	GLFWwindow* window = glfwCreateWindow(800, 600, "GlPractice", NULL, NULL);
+	if (window == NULL)
+	{
+		std::cout << "Failed to create window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
 
-    // GLAD manages function pointers, so we need to initialize it too.
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
+	// GLAD manages function pointers, so we need to initialize it too.
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
 
 	// compile shaders and attach it to the shader program
 	// 1. create a shader object, get its id
@@ -119,6 +119,92 @@ int main() {
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
+	// Initialize viewport. (same as the window for now)
+	// Im guessing this is for you to be able to set different sections of the screen for different purposes.
+	// Ex.: you can have the top of the window for navigation bar and the bottom for displaying content which will 
+	// be 2 different viewports.
+	glViewport(0, 0, 800, 600);
+
+	// Tell GLFW to call framebuffer_size_callback when the window gets resized by the user. 
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+	// We need to create the render loop or else the application shuts down immediately.
+	while (!glfwWindowShouldClose(window))
+	{
+		processInput(window);
+
+		// put rendering commands in the middle of input processing and event polling
+		draw();
+
+		// Not sure what this does but according to the docs, this will swap a large 2D buffer that contains the pixel
+		// values for the provided window. This is probably the method that renders the modified screen buffer.
+		// OpenGl uses a double buffering technique, where the front buffer is the buffer that gets rendered to the user
+		// while the back buffer is the one where current rendering tasks happen. When the framework finishes its work on
+		// the back buffer, the front buffer will get replaced by it. This is to avoid flickering issues.
+		glfwSwapBuffers(window);
+		// Poll for events. Important because the registered callbacks/event handlers gets notified by polling events.
+		glfwPollEvents();
+	}
+
+	// Free resources allocated by the framework upon closing the app.
+	glfwTerminate();
+
+	return 0;
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	// If the windows gets resized, reset the viewport to take up the whole screen.
+	glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow* window)
+{
+	// check if the user pressed down the escape button
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+}
+
+void draw()
+{
+	// clear the screen with rgba colors
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	// Tell OpenGl that it should redraw the screen with the specified color.
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	drawTriangle();
+}
+
+void drawTriangle()
+{
+	// holds 3 vertex of x, y, z NDC (Normalized Device Coordinates) coordinates
+	float vertices[] = {
+		-.5f, -.5f, .0f,
+		.5f, -.5f, .0f,
+		.0f, .5f, .0f
+	};
+	// id for the vertex buffer object (VBO)
+	unsigned int VBO;
+	// create a new object and assagn its ID in the VBO variable
+	// This object will hold the verticies array.
+	glGenBuffers(1, &VBO);
+	// Bind the VBO to the vertex buffer.
+	// OpenGl has many types of buffers and it allows us to bind multiple buffers at once as long as they have different types.
+	// So thats why we need to specify which type of buffer we want VBO to bind.
+	// From this point on any buffer calls we make on the GL_ARRAY_BUFFER target will be used to configure the 
+	// currently bound buffer, which is VBO.
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// Copy the vertices into the VBO.
+	// I think this is the point where copying to the graphics cards memory happens.
+	// Notice that we dont have to specify the VBO, because of OpenGl's state machine behaviour.
+	// The last parameter tells the GPU how to manage the data:
+		// GL_STREAM_DRAW: the data is set only once and used by the GPU at most a few times.
+		// GL_STATIC_DRAW : the data is set only once and used many times.
+		// GL_DYNAMIC_DRAW : the data is changed a lot and used many times.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+
 	// now we need to tell opengl how to interpret the VBO data
 	// the parameters:
 		// 1st: which vertex attribute we want to specify. Since layout = 0 in vertex shader for the position
@@ -139,58 +225,6 @@ int main() {
 	// giving the vertex attribute location as its argument, because vertex attributes are disabled by default.
 	glEnableVertexAttribArray(0);
 
-    // Initialize viewport. (same as the window for now)
-    // Im guessing this is for you to be able to set different sections of the screen for different purposes.
-    // Ex.: you can have the top of the window for navigation bar and the bottom for displaying content which will 
-    // be 2 different viewports.
-    glViewport(0, 0, 800, 600);
-
-    // Tell GLFW to call framebuffer_size_callback when the window gets resized by the user. 
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    // We need to create the render loop or else the application shuts down immediately.
-    while (!glfwWindowShouldClose(window))
-    {
-        processInput(window);
-
-        // put rendering commands in the middle of input processing and event polling
-        draw();
-
-        // Not sure what this does but according to the docs, this will swap a large 2D buffer that contains the pixel
-        // values for the provided window. This is probably the method that renders the modified screen buffer.
-        // OpenGl uses a double buffering technique, where the front buffer is the buffer that gets rendered to the user
-        // while the back buffer is the one where current rendering tasks happen. When the framework finishes its work on
-        // the back buffer, the front buffer will get replaced by it. This is to avoid flickering issues.
-        glfwSwapBuffers(window);
-        // Poll for events. Important because the registered callbacks/event handlers gets notified by polling events.
-        glfwPollEvents();
-    }
-
-    // Free resources allocated by the framework upon closing the app.
-    glfwTerminate();
-
-	return 0;
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // If the windows gets resized, reset the viewport to take up the whole screen.
-    glViewport(0, 0, width, height);
-}
-
-void processInput(GLFWwindow* window)
-{
-    // check if the user pressed down the escape button
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(window, true);
-    }
-}
-
-void draw()
-{
-    // clear the screen with rgba colors
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    // Tell OpenGl that it should redraw the screen with the specified color.
-    glClear(GL_COLOR_BUFFER_BIT);
+	// TODO: document this!!!
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
