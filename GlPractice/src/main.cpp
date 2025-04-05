@@ -4,6 +4,8 @@
 
 // Prototype for a method that gets called if the user resizes the window.
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+// Method signature for a callback that gets invoked when the user presses a button.
+void processInput(GLFWwindow* window);
 
 int main() {
     glfwInit();
@@ -44,6 +46,7 @@ int main() {
     // We need to create the render loop or else the application shuts down immediately.
     while (!glfwWindowShouldClose(window))
     {
+        processInput(window);
         // Not sure what this does but according to the docs, this will swap a large 2D buffer that contains the pixel
         // values for the provided window. This is probably the method that renders the modified screen buffer.
         // OpenGl uses a double buffering technique, where the front buffer is the buffer that gets rendered to the user
@@ -64,4 +67,13 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // If the windows gets resized, reset the viewport to take up the whole screen.
     glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow* window)
+{
+    // check if the user pressed down the escape button
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, true);
+    }
 }
