@@ -79,6 +79,7 @@ int main() {
 		// copy compilation info into the 512 long char array
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+		return -1;
 	}
 	// same for the fragment shader
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -89,7 +90,34 @@ int main() {
 	{
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+		return -1;
 	}
+
+	// create the shader program and link the compiled shaders.
+	// the shader program links the shader outputs to the next shader's input on the pipeline
+	// if we made an error, the linker will not be able to link the inputs and outputs so we will get an error
+	// first, create the program object
+	unsigned int shaderProgram = glCreateProgram();
+	// attach the compiled shaders to the program
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	// now link the shaders outputs and inputs
+	glLinkProgram(shaderProgram);
+	// we can also check for errors here
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		std::cout << "ERROR::PROGRAM::SHADER::LINKING_FAILED\n" << infoLog << std::endl;
+		return -1;
+	}
+	// now we need to tell which shader program to use
+	// after this call, this shader program will be used until told otherwise
+	glUseProgram(shaderProgram);
+
+	// finally, delete the shader objects, we dont need them after linking
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
 
     // Initialize viewport. (same as the window for now)
     // Im guessing this is for you to be able to set different sections of the screen for different purposes.
