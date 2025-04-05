@@ -119,6 +119,26 @@ int main() {
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
+	// now we need to tell opengl how to interpret the VBO data
+	// the parameters:
+		// 1st: which vertex attribute we want to specify. Since layout = 0 in vertex shader for the position
+		//      we need to set the 0th attribute to be interpreted as position
+		// 2nd: the size of the vertex attribute. vec3 will be composed by 3 elements of the VBO array
+		// 3rd: the data type of the attribute (vec3 consist of floating point values)
+		// 4th: should opengl automatically normalize the data? If we pass integers, opengl will normalize the values 
+		//      to be in [-1.0, 1.0] range (or [0.0, 1.0] range for unsigned values)
+		// 5th: also known as stride. Tells opengl how much space are there between vertex attributes. The next vertex data 
+		//      is located exactly 3 times of the size of a float (which is 4 bytes btw.) 
+		//      Note that if your VBO is tightly packeg (no space betweeb vertex data), you can pass 0 here and let gl 
+		//		figure it out.
+		// 6th: the offset of the vertex data, but since we start our coordinates at the first element of the VBO, 
+		//		we can say its 0
+	// note that this works, because we already set the current active VBO
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	// Now that we specified how OpenGL should interpret the vertex data we should also enable the vertex attribute
+	// giving the vertex attribute location as its argument, because vertex attributes are disabled by default.
+	glEnableVertexAttribArray(0);
+
     // Initialize viewport. (same as the window for now)
     // Im guessing this is for you to be able to set different sections of the screen for different purposes.
     // Ex.: you can have the top of the window for navigation bar and the bottom for displaying content which will 
