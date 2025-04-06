@@ -104,3 +104,50 @@ A VAO-hoz a VBO-t is hozzá tudjuk rendelni, ami a kirenderelendő objektumot je
 A jó dolog ebben, hogy egy VAO-hoz hozzárendelhetünk egy másik VBO-t és egy VBO-hoz hozzárendelhetünk különböző VAO-kat is.
 
 Ábra: ![Ábra](https://learnopengl.com/img/getting-started/vertex_array_objects.png)
+
+## Indexed drawing
+
+Az indexelt rajzolás egy olyan technika amivel optimalizálhatjuk a renderelést.
+
+Pl.: egy négyszöget úgy rajzolhatunk ki hogy 2 háromszög vertexei segítségével kirajzolunk 2 háromszöget, aminek az eredménye egy téglalap lesz. Itt viszont a háromszögek pontjai közül 2 meg fog egyezni.
+
+```c
+float vertices[] = {
+    // first triangle
+     0.5f,  0.5f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f,  0.5f, 0.0f,  // top left 
+    // second triangle
+     0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left
+}; 
+```
+
+Ezen segít az Element Buffer Object (EBO), aminek VBO-jában megadhatjuk a unique vertexeket, majd egy másik array-ben azt, hogy milyen sorrendben rajzolja ki az OpenGL a háromszögeket.
+
+```c
+float vertices[] = {
+     0.5f,  0.5f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left 
+};
+unsigned int indices[] = {  // note that we start from 0!
+    0, 1, 3,   // first triangle
+    1, 2, 3    // second triangle
+};  
+```
+
+![ábra](https://learnopengl.com/img/getting-started/vertex_array_objects_ebo.png)
+
+## Wireframe mode
+
+Hibakeresés során hasznos lehet.
+
+```c
+// draw the polygon's front and back side with a line
+glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+// draw the polygon's front and back side and fill the shape
+glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+```
