@@ -55,7 +55,7 @@ A shadereket GLSL (OpenGL Shading Language) nyelven írjuk.
 
 A shaderek legyenek minél kisebbek és lehessen őket párhuzamosan futtatni.
 
-Ábra: [Ábra](https://learnopengl.com/img/getting-started/pipeline.png)
+Ábra: ![Ábra](https://learnopengl.com/img/getting-started/pipeline.png)
 
 Renderelés menete:
  1. átadunk 3D-s pontokat a pipeline-nak (ezek a vertex-ek vagy vertices)
@@ -75,3 +75,32 @@ Renderelés menete:
 A GPU-n lefoglalt memória ami a vertexekről tárolja az adatot.
 
 A vertex shader ebből olvas ki annyi adatot amennyit megmondunk neki.
+
+## VAO (vertex array object)
+
+A VBO-khoz hozzá lehet bindolni vertex attribútumokat.
+
+```c
+// 0. átmásoljuk a vertexeinket a VBO-ba, amit OpenGl használni fog renderelésnél
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+// 1. beállítjuk az attribútum pointereket (ezek a shader forráskódjában lévő változók lesznek)
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+glEnableVertexAttribArray(0);  
+// 2. kiválasztjuk a shader programot amivel renderelni szeretnénk
+glUseProgram(shaderProgram);
+// 3. kirajzoljuk az alakot, mondjuk háromszög módban
+glDrawArrays(GL_TRIANGLES, 0, 3); 
+```
+
+Ezt minden esetben meg kellene tennünk, ha csak vbo-kat szeretnénk használni, ami elég idegesítő feladat, nem beszélve arról ha a shadereknek mondjuk 4-5 attribútuma is van.
+
+A VAO ebben hivatott segíteni. 
+
+A VAO-hoz hozzárendelhetünk attribútum pointereket, amik innentől kezdve egy gyűjtője lehet a rendereléshez szükséges közös dolgoknak.
+
+A VAO-hoz a VBO-t is hozzá tudjuk rendelni, ami a kirenderelendő objektumot jelenti.
+
+A jó dolog ebben, hogy egy VAO-hoz hozzárendelhetünk egy másik VBO-t és egy VBO-hoz hozzárendelhetünk különböző VAO-kat is.
+
+Ábra: ![Ábra](https://learnopengl.com/img/getting-started/vertex_array_objects.png)

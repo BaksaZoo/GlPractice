@@ -9,6 +9,8 @@ void processInput(GLFWwindow* window);
 // Handles drawing onto the screen.
 void draw();
 void drawTriangle();
+// initializes the window
+int initWindow();
 
 // This is the source code of the vertex shader.
 // This program will be run on the GPU after compiling it.
@@ -35,32 +37,11 @@ void main()
     FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
 })";
 
+GLFWwindow* window;
+
 int main() {
-	glfwInit();
-	// request client API with this version (3.3.?)
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	// Telling GLFW we want to use the core-profile means we'll get access to a smaller subset of OpenGL
-	// features without backwards-compatible features we no longer need. 
-	// This might lead to errors so comment it if you need to use legacy code.
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-
-	// request GLFW to create a windows
-	GLFWwindow* window = glfwCreateWindow(800, 600, "GlPractice", NULL, NULL);
-	if (window == NULL)
-	{
-		std::cout << "Failed to create window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-
-	// GLAD manages function pointers, so we need to initialize it too.
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
-	}
+	int code = initWindow();
+	if (code != 0) return code;
 
 	// compile shaders and attach it to the shader program
 	// 1. create a shader object, get its id
@@ -230,4 +211,35 @@ void drawTriangle()
 
 	// TODO: document this!!!
 	glDeleteBuffers(1, &VBO);
+}
+
+int initWindow()
+{
+	glfwInit();
+	// request client API with this version (3.3.?)
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	// Telling GLFW we want to use the core-profile means we'll get access to a smaller subset of OpenGL
+	// features without backwards-compatible features we no longer need. 
+	// This might lead to errors so comment it if you need to use legacy code.
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+
+	// request GLFW to create a windows
+	window = glfwCreateWindow(800, 600, "GlPractice", NULL, NULL);
+	if (window == NULL)
+	{
+		std::cout << "Failed to create window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
+
+	// GLAD manages function pointers, so we need to initialize it too.
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
+
+	return 0;
 }
