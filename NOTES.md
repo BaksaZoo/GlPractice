@@ -1,18 +1,24 @@
 # OpenGl jegyzet
 
 OpenGl maga egy state machine.
+
 Mindig az aktuális állapot szerint renderel amit a context határoz meg.
+
 A renderelést úgy tudjuk befolyásolni hogy a contextet módosítjuk (pl beállítunk egy változót hogy háromszögek helyett vonalakat rajzoljon)
 
 ## Objects
+
 Részhalmaza az OpenGl state machine beállításainak
 
+```c
 struct object_name {
     float  option1;
     int    option2;
     char[] name;
 };
+```
 
+```c
 // create object
 unsigned int objectId = 0;
 glGenObject(1, &objectId);
@@ -23,22 +29,34 @@ glSetObjectOption(GL_WINDOW_TARGET, GL_OPTION_WINDOW_WIDTH,  800);
 glSetObjectOption(GL_WINDOW_TARGET, GL_OPTION_WINDOW_HEIGHT, 600);
 // set context target back to default
 glBindObject(GL_WINDOW_TARGET, 0);
+```
 
 ## GLFW
+
 Operéciós rendszer függetlenül ad funkciókat.
+
 OpenGl próbál platform független maradni viszont van egy csomó dolog ami oprendszer függő, pl. input beolvasás, window kreálás stb.
+
 Ezeket a glfw könyvtár elrejti.
 
 ## GLAD
+
 A videó kártya fejlesztők különböző verziójú OpenGl-t támogatnak és ez nem derül ki compile time, ezáltal minden egyes OpenGl hívásnál le kellene ellenőrizni a támogatott verziót, majd csak ez után lehívni a function pointert.
+
 A GLAD ebben tud segíteni.
 
 ## Shader
+
 Egy shader egy apró program, ami a GPU-n fut.
+
 A shadereket pipelineokba szervezzük. Ezek egymás outputjait kapják inputnak.
+
 A shadereket GLSL (OpenGL Shading Language) nyelven írjuk.
+
 A shaderek legyenek minél kisebbek és lehessen őket párhuzamosan futtatni.
-Ábra: https://learnopengl.com/img/getting-started/pipeline.png
+
+Ábra: [Ábra](https://learnopengl.com/img/getting-started/pipeline.png)
+
 Renderelés menete:
  1. átadunk 3D-s pontokat a pipeline-nak (ezek a vertex-ek vagy vertices)
     vertex: információ egy 3D-s pontról. Ezek az információk lehetnek bármik, de a legfontosabb az x, y, z koordináta és a színe.
@@ -53,5 +71,7 @@ Renderelés menete:
     Mindezek után az adott objektumon ellenőrzésre kerül az alpha érték és a mélység, azaz hogy melyik objektum helyezkedik el egy másik előtt. Így érhető el az ablak vagy átlátszóság de az is hogy a térben hátrébb elhelyezkedő objektumok kirenderelésre kerüljenek (pl player fegyvere, amikor belemegy a falba kell hogy látszódjon)
 	
 ## VBO (vertex buffer object)
+
 A GPU-n lefoglalt memória ami a vertexekről tárolja az adatot.
+
 A vertex shader ebből olvas ki annyi adatot amennyit megmondunk neki.
