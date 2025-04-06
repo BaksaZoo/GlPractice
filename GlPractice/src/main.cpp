@@ -13,6 +13,8 @@ void drawTriangle();
 int initWindow();
 // initializes shaders
 int initShaders();
+int initVBO();
+int initVAO();
 
 // This is the source code of the vertex shader.
 // This program will be run on the GPU after compiling it.
@@ -41,12 +43,21 @@ void main()
 
 GLFWwindow* window;
 unsigned int shaderProgram;
+unsigned int VAO;
+// id for the vertex buffer object (VBO)
+unsigned int VBO;
 
 int main() {
 	int code = initWindow();
 	if (code != 0) return code;
 
 	code = initShaders();
+	if (code != 0) return code;
+
+	code = initVBO();
+	if (code != 0) return code;
+
+	code = initVAO();
 	if (code != 0) return code;
 
 	// Initialize viewport. (same as the window for now)
@@ -109,57 +120,22 @@ void draw()
 
 void drawTriangle()
 {
-	// holds 3 vertex of x, y, z NDC (Normalized Device Coordinates) coordinates
-	float vertices[] = {
-		-.5f, -.5f, .0f,
-		.5f, -.5f, .0f,
-		.0f, .5f, .0f
-	};
-	// id for the vertex buffer object (VBO)
-	unsigned int VBO;
-	// create a new object and assagn its ID in the VBO variable
-	// This object will hold the verticies array.
-	glGenBuffers(1, &VBO);
-	// Bind the VBO to the vertex buffer.
-	// OpenGl has many types of buffers and it allows us to bind multiple buffers at once as long as they have different types.
-	// So thats why we need to specify which type of buffer we want VBO to bind.
-	// From this point on any buffer calls we make on the GL_ARRAY_BUFFER target will be used to configure the 
-	// currently bound buffer, which is VBO.
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// Copy the vertices into the VBO.
-	// I think this is the point where copying to the graphics cards memory happens.
-	// Notice that we dont have to specify the VBO, because of OpenGl's state machine behaviour.
-	// The last parameter tells the GPU how to manage the data:
-		// GL_STREAM_DRAW: the data is set only once and used by the GPU at most a few times.
-		// GL_STATIC_DRAW : the data is set only once and used many times.
-		// GL_DYNAMIC_DRAW : the data is changed a lot and used many times.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+	// use the already set-up shader
+	glUseProgram(shaderProgram);
+	// bind the VAO
+	glBindVertexArray(VAO);
 
-	// now we need to tell opengl how to interpret the VBO data
-	// the parameters:
-		// 1st: which vertex attribute we want to specify. Since layout = 0 in vertex shader for the position
-		//      we need to set the 0th attribute to be interpreted as position
-		// 2nd: the size of the vertex attribute. vec3 will be composed by 3 elements of the VBO array
-		// 3rd: the data type of the attribute (vec3 consist of floating point values)
-		// 4th: should opengl automatically normalize the data? If we pass integers, opengl will normalize the values 
-		//      to be in [-1.0, 1.0] range (or [0.0, 1.0] range for unsigned values)
-		// 5th: also known as stride. Tells opengl how much space are there between vertex attributes. The next vertex data 
-		//      is located exactly 3 times of the size of a float (which is 4 bytes btw.) 
-		//      Note that if your VBO is tightly packeg (no space betweeb vertex data), you can pass 0 here and let gl 
-		//		figure it out.
-		// 6th: the offset of the vertex data, but since we start our coordinates at the first element of the VBO, 
-		//		we can say its 0
-	// note that this works, because we already set the current active VBO
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	// Now that we specified how OpenGL should interpret the vertex data we should also enable the vertex attribute
-	// giving the vertex attribute location as its argument, because vertex attributes are disabled by default.
-	glEnableVertexAttribArray(0);
-
-	// TODO: document this!!!
+	// TODO: document this properly!!!
+	// Tell opengl to draw the content of the VBO as triangles. Available modes are points, lines and
+	// triangles as far as i know.
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	// TODO: document this!!!
-	glDeleteBuffers(1, &VBO);
+	// This is here to prevent memory leaks.
+	// If we dont delete the memory allocated in the VBO, OpenGl wont free it automatically.
+	// Commented out because if you are using a VAO, the VBO gets allocated only once, and if you free it
+	// OpenGl will only render it for one frame.
+	// glDeleteBuffers(1, &VBO);
 }
 
 int initWindow()
@@ -245,11 +221,73 @@ int initShaders() {
 	}
 	// now we need to tell which shader program to use
 	// after this call, this shader program will be used until told otherwise
-	glUseProgram(shaderProgram);
+	// ---commented to not have a default shader--- glUseProgram(shaderProgram);
 
 	// finally, delete the shader objects, we dont need them after linking
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+
+	return 0;
+}
+
+int initVBO()
+{
+	// create a new object and assagn its ID in the VBO variable
+	// This object will hold the verticies array.
+	glGenBuffers(1, &VBO);
+	return 0;
+}
+
+int initVAO()
+{
+	// holds 3 vertex of x, y, z NDC (Normalized Device Coordinates) coordinates
+	float trianglePoints[] = {
+		-.5f, -.5f, .0f,
+		.5f, -.5f, .0f,
+		.0f, .5f, .0f
+	};
+
+	// here it seems like its just a simple array, like VBO (at this point it actually is)
+	glGenVertexArrays(1, &VAO);
+
+	// we need to bind it so the lines after this will affect the VAO object (not the currently bound object, whatever it is)
+	// remember OpenGl acts like a state-machine
+	glBindVertexArray(VAO);
+	// Bind the VBO to the vertex buffer.
+	// OpenGl has many types of buffers and it allows us to bind multiple buffers at once as long as they have different types.
+	// So thats why we need to specify which type of buffer we want VBO to bind.
+	// From this point on any buffer calls we make on the GL_ARRAY_BUFFER target will be used to configure the 
+	// currently bound buffer, which is VBO.
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// Copy the vertices into the VBO.
+	// I think this is the point where copying to the graphics cards memory happens.
+	// Notice that we dont have to specify the VBO, because of OpenGl's state machine behaviour.
+	// The last parameter tells the GPU how to manage the data:
+		// GL_STREAM_DRAW: the data is set only once and used by the GPU at most a few times.
+		// GL_STATIC_DRAW : the data is set only once and used many times.
+		// GL_DYNAMIC_DRAW : the data is changed a lot and used many times.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(trianglePoints), trianglePoints, GL_DYNAMIC_DRAW);
+	// now we need to tell opengl how to interpret the VBO data
+	// the parameters:
+		// 1st: which vertex attribute we want to specify. Since layout = 0 in vertex shader for the position
+		//      we need to set the 0th attribute to be interpreted as position
+		// 2nd: the size of the vertex attribute. vec3 will be composed by 3 elements of the VBO array
+		// 3rd: the data type of the attribute (vec3 consist of floating point values)
+		// 4th: should opengl automatically normalize the data? If we pass integers, opengl will normalize the values 
+		//      to be in [-1.0, 1.0] range (or [0.0, 1.0] range for unsigned values)
+		// 5th: also known as stride. Tells opengl how much space are there between vertex attributes. The next vertex data 
+		//      is located exactly 3 times of the size of a float (which is 4 bytes btw.) 
+		//      Note that if your VBO is tightly packeg (no space betweeb vertex data), you can pass 0 here and let gl 
+		//		figure it out.
+		// 6th: the offset of the vertex data, but since we start our coordinates at the first element of the VBO, 
+		//		we can say its 0
+	// note that this works, because we already set the current active VBO
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	// Now that we specified how OpenGL should interpret the vertex data we should also enable the vertex attribute
+	// giving the vertex attribute location as its argument, because vertex attributes are disabled by default.
+	glEnableVertexAttribArray(0);
+
+	// at this point we probably should unbind the vao, but i dont know how to do that
 
 	return 0;
 }
