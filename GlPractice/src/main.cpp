@@ -121,7 +121,8 @@ void draw()
 void drawTriangle()
 {
 	// use the already set-up shader
-	glUseProgram(shaderProgram);
+	// comment out if youre expecting to have a default shader
+	// glUseProgram(shaderProgram);
 	// bind the VAO
 	glBindVertexArray(VAO);
 
@@ -225,7 +226,8 @@ int initShaders() {
 	}
 	// now we need to tell which shader program to use
 	// after this call, this shader program will be used until told otherwise
-	// ---commented to not have a default shader--- glUseProgram(shaderProgram);
+	// comment this to not have a default shader
+	glUseProgram(shaderProgram);
 
 	// finally, delete the shader objects, we dont need them after linking
 	glDeleteShader(vertexShader);
