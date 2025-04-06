@@ -128,9 +128,13 @@ void drawTriangle()
 	// TODO: document this properly!!!
 	// Tell opengl to draw the content of the VBO as triangles. Available modes are points, lines and
 	// triangles as far as i know.
+	// Arguments:
+		// 1st: the OpenGl primitive, we want to draw. Possible values are GL_TRIANGLES, GL_LINES and GL_POINTS
+		// 2nd: the vertexArray start location (currently the vertex array contains 3 points, where the first starts at 0)
+		// 3rd: the end location of the vertex array (currently the vertex array contains 3 points, that makes the 
+		//      triangle so we specify that we want to draw all 3)
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	// TODO: document this!!!
 	// This is here to prevent memory leaks.
 	// If we dont delete the memory allocated in the VBO, OpenGl wont free it automatically.
 	// Commented out because if you are using a VAO, the VBO gets allocated only once, and if you free it
