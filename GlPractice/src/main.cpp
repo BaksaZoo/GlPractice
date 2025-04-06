@@ -2,7 +2,7 @@
 #include "hello_triangle_excercise.h"
 
 int main() {
-	int programFlag = 0;
+	int programFlag = 1;
 
 	if (programFlag == 0)
 	{

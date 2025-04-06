@@ -3,7 +3,10 @@
 
 namespace hello_triangle {
     int main();
-    int initWindow();
+    int initContext();
+    int initShaders();
+    void initVAOs();
+    void renderTriangles();
 }
 
 #endif

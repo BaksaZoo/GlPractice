@@ -243,7 +243,7 @@ void main()
 			.0f, .5f, .0f
 		};
 
-		// here it seems like its just a simple array, like VBO (at this point it actually is)
+		// generate the VAO
 		glGenVertexArrays(1, &VAO);
 
 		// we need to bind it so the lines after this will affect the VAO object (not the currently bound object, whatever it is)
