@@ -136,6 +136,7 @@
     <ClCompile Include="src\hello_triangle_excercise.cpp" />
     <ClCompile Include="src\practice.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\uniforms.cpp" />
     <ClCompile Include="src\uniforms.h" />
     <ClCompile Include="src\shader_data.cpp" />
@@ -144,6 +145,14 @@
     <ClInclude Include="src\hello_triangle_excercise.h" />
     <ClInclude Include="src\practice.h" />
     <ClInclude Include="src\shader_data.h" />
+    <ClInclude Include="src\texture.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\64x64.jpg" />
+    <Image Include="assets\wall.jpg">
+      <DeploymentContent>false</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </Image>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -36,6 +36,9 @@
     <ClCompile Include="src\shader_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\hello_triangle_excercise.h">
@@ -47,5 +50,16 @@
     <ClInclude Include="src\shader_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\wall.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\64x64.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

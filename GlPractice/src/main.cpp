@@ -2,9 +2,10 @@
 #include "hello_triangle_excercise.h"
 #include "uniforms.h"
 #include "shader_data.h"
+#include "texture.h"
 
 int main() {
-	int programFlag = 3;
+	int programFlag = 4;
 
 	if (programFlag == 0)
 	{
@@ -21,6 +22,10 @@ int main() {
 	else if (programFlag == 3)
 	{
 		shader_data::main();
+	}
+	else if (programFlag == 4)
+	{
+		texture::main();
 	}
 
 	return 0;

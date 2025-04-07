@@ -234,3 +234,13 @@ void main()
 ```
 
 Érdemes fejben tartani, hogy ha a glsl kódunkban nem hivatkozunk a uniform változóra, akkor a fordítás során a compiler ki fogja onnan törölni.
+
+## Textúrázás
+
+A textúrázás az, amikor egy alakra egy képet illesztünk.
+
+Ezt úgy tesszük, hogy megadunk egy alakot (pl egy háromszög) és minden egyes vertex-ét megfeleltetjük a textúrának egy-egy korrdinátájával.
+
+![ábra](https://learnopengl.com/img/getting-started/tex_coords.png)
+
+Az ábrán látható háromszög 3 vertexét hozzá kell rendelni a textúra 3 pontjához. A többi fragment pixel színét az interpoláció végzi.
