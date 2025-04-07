@@ -138,10 +138,12 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\uniforms.cpp" />
     <ClCompile Include="src\uniforms.h" />
+    <ClCompile Include="src\shader_data.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\hello_triangle_excercise.h" />
     <ClInclude Include="src\practice.h" />
+    <ClInclude Include="src\shader_data.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
