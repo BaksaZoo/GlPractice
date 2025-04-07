@@ -41,20 +41,20 @@ void main()
 		if (initShaders() != 0) return -1;
 		// 4. create two triangles
 		initVAOs();
-		// 5. render the triangles
-		renderTriangles();
 
-		glfwSwapBuffers(window);
-
-		// 6. create render loop
+		// 5. create render loop
 		while (!glfwWindowShouldClose(window))
 		{
-			glfwPollEvents();
+			// 6. render the triangles
+			renderTriangles();
 
 			if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			{
 				glfwSetWindowShouldClose(window, true);
 			}
+
+			glfwPollEvents();
+			glfwSwapBuffers(window);
 		}
 
 		// 7. clean resources
@@ -65,18 +65,26 @@ void main()
 
 	void renderTriangles()
 	{
+		// get the time to animate
+		double t = glfwGetTime();
+
 		// get the location of the "color" uniform
 		int colorLocation = glGetUniformLocation(shaderProgram, "color");
 		// use shader program once
+		// Note that finding the uniform location does not require you to use the shader program first, 
+		// but updating a uniform does require you to first use the program (by calling glUseProgram), 
+		// because it sets the uniform on the currently active shader program.
 		glUseProgram(shaderProgram);
-		// and set the "color" uniform to orange
-		glUniform4f(colorLocation, 1.0f, .5f, .2f, 1.0f);
+		// and set the "color" uniform 's red part to the sin of time (over time it will animate)
+		float redPart = sin(t) / 2.f + .5f;
+		glUniform4f(colorLocation, redPart, .1f, .1f, 1.0f);
 
 		glBindVertexArray(orangeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		// now the same for the yellow triangle
-		glUniform4f(colorLocation, 1.0f, 1.0f, .0f, 1.0f);
+		float greenPart = -sin(t) / 2.f + .5f;
+		glUniform4f(colorLocation, .1f, greenPart, .1f, 1.0f);
 
 		glBindVertexArray(yellowVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
