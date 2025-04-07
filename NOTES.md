@@ -151,3 +151,86 @@ glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 // draw the polygon's front and back side and fill the shape
 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 ```
+
+## GLSL
+
+A GLSL az opengl egyedi programozási nyelve, amivel a GPU-ra tudunk programot írni.
+
+Ezeknek a programoknak csak inputjaik és outputjaik vannak és a programok csak ezeken keresztül kommunikálhatnak.
+
+### GLSL típusok
+
+GLSL számos beépített típust kínál fel:
+
+Vektorok:
+  - vecn: alapértelmezett vektor N darab float értékkel
+  - bvecn: vektor N darab bool értékkel
+  - ivecn: vektor N darab integer értékkel
+  - uvecn: nektor N darab unsigned integer értékkel
+  - dvecn: vektor N darab double értékkel
+
+A vektorok kompnenseit az x, y, z, w paramétereikkel érhetjük el, pl. vector.x
+
+A vektorok elérésére elég fura szintaxisok is vannak:
+
+```glsl
+vec2 someVec;
+vec4 differentVec = someVec.xyxx;
+vec3 anotherVec = differentVec.zyw;
+vec4 otherVec = someVec.xxxx + anotherVec.yxzy;
+```
+
+### Linking
+
+A shaderek inputjait és outputjait linkeléssel kötjük össze.
+
+Ha egy shader output változójának típusa és neve megegyezik az őt követő shader input változójának típusával és nevével, akkor ezek a linkelés során összekötésre kerülnek és az első shader outputja bekerül az őt követő shader inputjába.
+
+Pl.:
+
+Vertex shader:
+```glsl
+#version 330 core
+layout (location = 0) in vec3 aPos; // the position variable has attribute position 0
+  
+out vec4 vertexColor; // specify a color output to the fragment shader
+
+void main()
+{
+    gl_Position = vec4(aPos, 1.0); // see how we directly give a vec3 to vec4's constructor
+    vertexColor = vec4(0.5, 0.0, 0.0, 1.0); // set the output variable to a dark-red color
+}
+```
+
+Fragment shader:
+```glsl
+#version 330 core
+out vec4 FragColor;
+  
+in vec4 vertexColor; // the input variable from the vertex shader (same name and same type)  
+
+void main()
+{
+    FragColor = vertexColor;
+} 
+```
+
+### Uniform változók
+
+A uniform változók egy másik módja, hogy adatot küldjünk a GPU-nak.
+
+Hasonlítanak a vertex attribútumokhoz, annyi különbséggel, hogy a uniform változók globálisak per shader object.
+
+```glsl
+#version 330 core
+out vec4 FragColor;
+  
+uniform vec4 ourColor; // we set this variable in the OpenGL code.
+
+void main()
+{
+    FragColor = ourColor;
+}
+```
+
+Érdemes fejben tartani, hogy ha a glsl kódunkban nem hivatkozunk a uniform változóra, akkor a fordítás során a compiler ki fogja onnan törölni.
